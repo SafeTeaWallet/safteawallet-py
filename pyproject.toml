@@ -5,3 +5,6 @@ requires-python = ">=3.10"
 dependencies = [
     "web3>=7.0.0",
 ]
+
+[tool.setuptools.package-data]
+safetea = ["abis/*.json"]
