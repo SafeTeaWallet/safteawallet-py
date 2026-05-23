@@ -5,9 +5,10 @@ from .utils import factory_abi
 
 
 class SafeTeaFactory:
-    def __init__(self, rpc_url: str, factory_address: str) -> None:
+    def __init__(self, rpc_url: str, factory_address: str, private_key: Optional[str] = None) -> None:
         self.web3 = Web3(Web3.HTTPProvider(rpc_url))
         self.factory_address = self.web3.to_checksum_address(factory_address)
+        self.private_key = private_key
 
         self.factory_contract = self.web3.eth.contract(
             address=self.factory_address, abi=factory_abi

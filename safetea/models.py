@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import IntEnum
 
+from eth_typing.evm import ChecksumAddress
+
 
 class TxStatus(IntEnum):
     PENDING = 0
@@ -122,3 +124,17 @@ class OwnerProposal:
     @property
     def is_canceled(self) -> bool:
         return self.status == TxStatus.CANCELED
+
+
+@dataclass(frozen=True)
+class WalletInfo:
+    address: ChecksumAddress
+    owners: list[ChecksumAddress]
+    threshold: int
+
+@dataclass(frozen=True)
+class TxReceipt:
+    tx_hash: str
+    block_number: int
+    gas_used: int
+    wallet_address: ChecksumAddress | None  # set for create_wallet receipts

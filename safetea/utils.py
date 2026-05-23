@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta, timezone
 import json
 from pathlib import Path
 
@@ -22,3 +23,19 @@ def factory_abi() -> dict:
 @staticmethod
 def wallet_abi() -> dict:
     return _load_json_file("wallet.json")
+
+
+def in_hours(hours: int) -> int:
+    """Convert hours to a unix timestamp in the future."""
+    return int((datetime.now(timezone.utc) + timedelta(hours=hours)).timestamp())
+
+def in_days(days: int) -> int:
+    """Convert days to a unix timestamp in the future."""
+    return int((datetime.now(timezone.utc) + timedelta(days=days)).timestamp())
+
+def at_datetime(dt: datetime) -> int:
+    """Convert a datetime to a unix timestamp."""
+    if dt.tzinfo is None:
+        # Assume naive datetimes are in UTC
+        dt = dt.replace(tzinfo=timezone.utc)
+    return int(dt.timestamp())
