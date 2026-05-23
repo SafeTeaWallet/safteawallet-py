@@ -5,6 +5,7 @@ from eth_account import Account
 from eth_account.signers.local import LocalAccount
 
 from .factory import SafeTeaFactory
+from .wallet import SafeTeaWallet
 
 
 class SafeTeaClient:
@@ -39,7 +40,15 @@ class SafeTeaClient:
             self.account = Account.from_key(private_key)
 
         self.factory = SafeTeaFactory(
-            rpc_url=rpc_url,
+            web3=self.web3,
             factory_address=self.factory_address,
+            account=self.account,
+        )
+        
+    def wallet(self, wallet_address: str) -> SafeTeaWallet:
+        """Get a SafeTeaWallet instance for the specified wallet address."""
+        return SafeTeaWallet(
+            web3=self.web3,
+            wallet_address=wallet_address,
             account=self.account,
         )

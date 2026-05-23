@@ -132,9 +132,24 @@ class WalletInfo:
     owners: list[ChecksumAddress]
     threshold: int
 
+
 @dataclass(frozen=True)
 class TxReceipt:
     tx_hash: str
     block_number: int
     gas_used: int
     wallet_address: ChecksumAddress | None  # set for create_wallet receipts
+
+
+
+
+@dataclass
+class WalletCreationResult:
+    wallet_address: str
+    transaction_hash: str
+    
+@dataclass
+class WalletResult:
+    address: ChecksumAddress
+    owners: list[ChecksumAddress]
+    threshold: int

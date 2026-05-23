@@ -7,8 +7,8 @@ from .utils import factory_abi
 
 
 class SafeTeaFactory:
-    def __init__(self, rpc_url: str, factory_address: str, account: Account) -> None:
-        self.web3 = Web3(Web3.HTTPProvider(rpc_url))
+    def __init__(self, web3: Web3, factory_address: str, account: Account) -> None:
+        self.web3 = web3
         self.factory_address = self.web3.to_checksum_address(factory_address)
         self.account = account
 
