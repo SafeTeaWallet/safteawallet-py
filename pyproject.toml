@@ -3,6 +3,7 @@ name = "safetea"
 version = "0.1.0"
 requires-python = ">=3.10"
 dependencies = [
+    "dotenv>=0.9.9",
     "web3>=7.0.0",
 ]
 
