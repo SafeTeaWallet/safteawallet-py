@@ -1,7 +1,7 @@
-from typing import List, Optional, Dict, Any
+from typing import List
 from eth_typing import ChecksumAddress
 from web3 import Web3, Account
-
+from .exceptions import SafeTeaError
 from .models import WalletCreationResult
 from .utils import factory_abi
 
@@ -36,7 +36,7 @@ class SafeTeaFactory:
             {
                 "from": self.account.address,
                 "nonce": self.web3.eth.get_transaction_count(self.account.address),
-                "gas": 4_000_000,
+                "gas": self.factory_contract.functions.createWallet(owners).estimate_gas({"from": self.account.address}),
                 "gasPrice": self.web3.eth.gas_price,
             }
         )
@@ -67,4 +67,7 @@ class SafeTeaFactory:
         Returns:
             List[ChecksumAddress]: A list of wallet addresses owned by the user.
         """
-        return self.factory_contract.functions.getUserWallets(user_address).call()
+        try:
+            return self.factory_contract.functions.getUserWallets(user_address).call()
+        except Exception as e:
+            raise SafeTeaError(f"Error getting user wallets: {e}")
