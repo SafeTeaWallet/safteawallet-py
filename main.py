@@ -1,4 +1,5 @@
-from safetea import SafeTeaClient
+from safteawallet_py.client import SafeTeaClient
+from safteawallet_py.exceptions import SafeTeaError
 from dotenv import load_dotenv
 import os
 

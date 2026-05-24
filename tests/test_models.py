@@ -1,5 +1,5 @@
 import pytest
-from safetea.models import Transaction, TxStatus, OwnerProposal, ProposalType
+from safteawallet_py.models import Transaction, TxStatus, OwnerProposal, ProposalType
 
 def test_transaction_from_tuple():
     t = (

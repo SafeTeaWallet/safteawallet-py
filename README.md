@@ -9,7 +9,7 @@ It provides a simple and modular interface to create new multi-signature wallets
 Install the package via pip:
 
 ```bash
-pip install safetea
+pip install safteawallet-py
 ```
 
 ## Usage
@@ -20,7 +20,7 @@ To interact with SafeTea contracts, initialize the `SafeTeaClient` using a Web3 
 
 ```python
 from web3 import Web3
-from safetea.client import SafeTeaClient
+from safteawallet_py.client import SafeTeaClient
 
 # Initialize the SafeTea client
 private_key = "0x..."

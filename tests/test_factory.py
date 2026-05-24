@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import MagicMock
 from web3 import Web3
-from safetea.factory import SafeTeaFactory
-from safetea.exceptions import SafeTeaError
+from safteawallet_py.factory import SafeTeaFactory
+from safteawallet_py.exceptions import SafeTeaError
 
 @pytest.fixture
 def mock_web3():

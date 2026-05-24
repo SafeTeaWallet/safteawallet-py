@@ -1,8 +1,8 @@
 import pytest
 from unittest.mock import MagicMock
 from web3 import Web3
-from safetea.wallet import SafeTeaWallet
-from safetea.exceptions import SafeTeaError, NotOwnerError, ProposalNotFoundError
+from safteawallet_py.wallet import SafeTeaWallet
+from safteawallet_py.exceptions import SafeTeaError, NotOwnerError, ProposalNotFoundError
 
 @pytest.fixture
 def mock_web3():
