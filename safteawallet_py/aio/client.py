@@ -6,6 +6,7 @@ from eth_account.signers.local import LocalAccount
 
 from .factory import AsyncSafeTeaFactory
 from .wallet import AsyncSafeTeaWallet
+from .erc20_manager import AsyncERC20Manager
 
 
 class AsyncSafeTeaClient:
@@ -54,4 +55,15 @@ class AsyncSafeTeaClient:
             web3=self.web3,
             wallet_address=wallet_address,
             account=self.account,
+        )
+
+    def erc20(self, token_address: str, wallet_address: str) -> AsyncERC20Manager:
+        """Get an AsyncERC20Manager for *token_address* operating through *wallet_address*."""
+        wallet = self.wallet(wallet_address)
+        return AsyncERC20Manager(
+            web3=self.web3,
+            token_address=token_address,
+            wallet_address=wallet_address,
+            account=self.account,
+            wallet=wallet,
         )

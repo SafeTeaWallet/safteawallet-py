@@ -25,6 +25,11 @@ def wallet_abi() -> dict:
     return _load_json_file("wallet.json")
 
 
+@staticmethod
+def erc20_abi() -> dict:
+    return _load_json_file("erc20.json")
+
+
 def in_hours(hours: int) -> int:
     """Convert hours to a unix timestamp in the future."""
     return int((datetime.now(timezone.utc) + timedelta(hours=hours)).timestamp())

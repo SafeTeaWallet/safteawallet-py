@@ -6,6 +6,7 @@ from eth_account.signers.local import LocalAccount
 
 from .factory import SafeTeaFactory
 from .wallet import SafeTeaWallet
+from .erc20_manager import ERC20Manager
 
 
 class SafeTeaClient:
@@ -51,4 +52,15 @@ class SafeTeaClient:
             web3=self.web3,
             wallet_address=wallet_address,
             account=self.account,
+        )
+
+    def erc20(self, token_address: str, wallet_address: str) -> ERC20Manager:
+        """Get an ERC20Manager for *token_address* operating through *wallet_address*."""
+        wallet = self.wallet(wallet_address)
+        return ERC20Manager(
+            web3=self.web3,
+            token_address=token_address,
+            wallet_address=wallet_address,
+            account=self.account,
+            wallet=wallet,
         )
