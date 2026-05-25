@@ -4,25 +4,48 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "safteawallet-py"
-version = "0.3.0"
+version = "0.3.1"
 description = "Python SDK for interacting with SafeTea Multi-Signature Wallets"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"
+authors = [
+    { name = "Rakib Hossain" },
+    { email = "rakib4ggp@gmail.com" }
+]
+keywords = ["ethereum", "web3", "multisig", "wallet", "erc20", "blockchain"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
 dependencies = [
-    "dotenv>=0.9.9",
-    "pytest>=9.0.3",
-    "pytest-asyncio>=1.3.0",
     "web3>=7.0.0",
+    "python-dotenv>=1.0.0",
 ]
 
-[tool.setuptools]
-packages = ["safteawallet_py"]
+[project.optional-dependencies]
+dev = [
+    "pytest==9.0.3",
+    "pytest-asyncio==1.3.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/SafeTeaWallet/safteawallet-py"
+Repository = "https://github.com/SafeTeaWallet/safteawallet-py"
+Issues = "https://github.com/SafeTeaWallet/safteawallet-py/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["safteawallet_py*"]
 
 [tool.setuptools.package-data]
 safteawallet_py = ["abis/*.json"]
 
 [tool.pytest.ini_options]
-pythonpath = [
-  "."
-]
+pythonpath = ["."]
+asyncio_mode = "strict"
