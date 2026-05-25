@@ -8,3 +8,4 @@ draft.md
 dist/
 build/
 *.egg-info
+.vscode/

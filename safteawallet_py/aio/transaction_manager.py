@@ -3,17 +3,23 @@ from ..models import Transaction
 from ..exceptions import SafeTeaError, AlreadyVotedError, TransactionExpiredError
 
 class AsyncTransactionManagerMixin:
-    async def _validate_transaction_state(self, transaction: Transaction) -> None:
+    async def _validate_transaction_state(self, transaction: Transaction, tx_index: int) -> None:
         if transaction.is_executed:
             raise SafeTeaError("Transaction has already been executed")
 
         if transaction.is_canceled:
             raise SafeTeaError("Transaction has been canceled")
 
-        if self.address in transaction.confirmations:
+        has_confirmed = await self.wallet_contract.functions.hasConfirmedTransaction(
+            tx_index, self.address
+        ).call()
+        if has_confirmed:
             raise AlreadyVotedError("You have already confirmed this transaction")
 
-        if self.address in transaction.rejections:
+        has_rejected = await self.wallet_contract.functions.hasRejectedTransaction(
+            tx_index, self.address
+        ).call()
+        if has_rejected:
             raise AlreadyVotedError("You have already rejected this transaction")
 
         latest_timestamp = await self._latest_timestamp()
@@ -47,7 +53,7 @@ class AsyncTransactionManagerMixin:
         """Confirm a transaction proposal asynchronously."""
         try:
             transaction = await self.get_transaction(tx_index)
-            await self._validate_transaction_state(transaction)
+            await self._validate_transaction_state(transaction, tx_index)
 
             tx_hash = await self._build_and_send(
                 self.wallet_contract.functions.confirmTransaction(tx_index)
@@ -60,7 +66,7 @@ class AsyncTransactionManagerMixin:
         """Reject a transaction proposal asynchronously."""
         try:
             transaction = await self.get_transaction(tx_index)
-            await self._validate_transaction_state(transaction)
+            await self._validate_transaction_state(transaction, tx_index)
 
             tx_hash = await self._build_and_send(
                 self.wallet_contract.functions.rejectTransaction(tx_index)

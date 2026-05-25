@@ -3,17 +3,23 @@ from .models import Transaction
 from .exceptions import SafeTeaError, AlreadyVotedError, TransactionExpiredError
 
 class TransactionManagerMixin:
-    def _validate_transaction_state(self, transaction: Transaction) -> None:
+    def _validate_transaction_state(self, transaction: Transaction, tx_index: int) -> None:
         if transaction.is_executed:
             raise SafeTeaError("Transaction has already been executed")
 
         if transaction.is_canceled:
             raise SafeTeaError("Transaction has been canceled")
 
-        if self.address in transaction.confirmations:
+        has_confirmed = self.wallet_contract.functions.hasConfirmedTransaction(
+            tx_index, self.address
+        ).call()
+        if has_confirmed:
             raise AlreadyVotedError("You have already confirmed this transaction")
 
-        if self.address in transaction.rejections:
+        has_rejected = self.wallet_contract.functions.hasRejectedTransaction(
+            tx_index, self.address
+        ).call()
+        if has_rejected:
             raise AlreadyVotedError("You have already rejected this transaction")
 
         if transaction.expiry < self._latest_timestamp():
@@ -46,7 +52,7 @@ class TransactionManagerMixin:
         """Confirm a transaction proposal."""
         try:
             transaction = self.get_transaction(tx_index)
-            self._validate_transaction_state(transaction)
+            self._validate_transaction_state(transaction, tx_index)
 
             tx_hash = self._build_and_send(
                 self.wallet_contract.functions.confirmTransaction(tx_index)
@@ -59,7 +65,7 @@ class TransactionManagerMixin:
         """Reject a transaction proposal."""
         try:
             transaction = self.get_transaction(tx_index)
-            self._validate_transaction_state(transaction)
+            self._validate_transaction_state(transaction, tx_index)
 
             tx_hash = self._build_and_send(
                 self.wallet_contract.functions.rejectTransaction(tx_index)

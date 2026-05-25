@@ -23,36 +23,35 @@ class Transaction:
     value: int  # wei
     data: bytes
     status: TxStatus
-    confirmations: int
-    rejections: int
+    confirmations: int  # vote count
+    rejections: int     # vote count
     expiry: int  # unix timestamp
     created_at: int  # unix timestamp
 
     @classmethod
     def from_tuple(cls, t: tuple) -> Transaction:
-        """Build from the raw tuple returned by getTransaction()."""
+        """Build from the TransactionView tuple returned by getTransaction().
+
+        Tuple order: (index, to, value, data, status, isExpired, confirmations,
+                      rejections, expiry, createdAt)
+        """
         (
+            _index,
             to,
             value,
             data,
-            executed,
-            canceled,
+            status_int,
+            _is_expired,
             confirmations,
             rejections,
             expiry,
             created_at,
         ) = t
-        if canceled:
-            status = TxStatus.CANCELED
-        elif executed:
-            status = TxStatus.EXECUTED
-        else:
-            status = TxStatus.PENDING
         return cls(
             to=to,
             value=value,
             data=bytes(data),
-            status=status,
+            status=TxStatus(status_int),
             confirmations=confirmations,
             rejections=rejections,
             expiry=expiry,
@@ -83,30 +82,27 @@ class OwnerProposal:
     created_at: int  # unix timestamp
 
     @classmethod
-    def from_tuple(cls, t: tuple, proposal_type: int) -> OwnerProposal:
-        """Build from the raw tuple returned by getOwnerProposal().
+    def from_tuple(cls, t: tuple) -> OwnerProposal:
+        """Build from the OwnerProposalView tuple returned by getOwnerProposal().
 
-        proposal_type must be fetched separately (not included in the view return).
+        Tuple order: (index, proposedOwner, proposalType, status, isExpired,
+                      confirmations, rejections, expiry, createdAt)
         """
         (
+            _index,
             proposed_owner,
-            executed,
-            canceled,
+            proposal_type_int,
+            status_int,
+            _is_expired,
             confirmations,
             rejections,
             expiry,
             created_at,
         ) = t
-        if canceled:
-            status = TxStatus.CANCELED
-        elif executed:
-            status = TxStatus.EXECUTED
-        else:
-            status = TxStatus.PENDING
         return cls(
             proposed_owner=proposed_owner,
-            status=status,
-            proposal_type=ProposalType(proposal_type),
+            status=TxStatus(status_int),
+            proposal_type=ProposalType(proposal_type_int),
             confirmations=confirmations,
             rejections=rejections,
             expiry=expiry,
