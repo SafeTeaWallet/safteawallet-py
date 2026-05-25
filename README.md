@@ -89,6 +89,52 @@ wallet.confirm_owner_proposal(proposal_index)
 wallet.reject_owner_proposal(proposal_index)
 ```
 
+### ERC20 Token Operations
+
+Get an `ERC20Manager` via `client.erc20(token_address, wallet_address)`.
+
+```python
+token = client.erc20("0xTokenAddress", "0xYourWalletAddress")
+```
+
+**Read operations** query the token contract directly:
+
+```python
+name     = token.name()
+symbol   = token.symbol()
+decimals = token.decimals()
+supply   = token.total_supply()
+
+# Balance of any address
+balance = token.balance_of("0xSomeAddress")
+
+# Shortcut — balance held by the wallet itself
+wallet_balance = token.wallet_balance()
+
+# Allowance
+allowance = token.allowance("0xOwner", "0xSpender")
+```
+
+**Write operations** encode the ERC20 calldata and submit it through the wallet's multi-sig queue. They return the proposal `tx_index`, which owners then confirm or reject like any other transaction.
+
+```python
+import time
+expiry = int(time.time()) + 3600
+
+# Propose a token transfer from the wallet
+tx_index = token.transfer("0xRecipient", 100 * 10**18, expiry=expiry)
+
+# Propose an approval
+tx_index = token.approve("0xSpender", 500 * 10**18, expiry=expiry)
+
+# Propose a transferFrom
+tx_index = token.transfer_from("0xFrom", "0xTo", 50 * 10**18, expiry=expiry)
+
+# Owners vote on the proposal as usual
+wallet = client.wallet("0xYourWalletAddress")
+wallet.confirm_transaction(tx_index)
+```
+
 ---
 
 ## Async API (`safteawallet_py.aio`)
@@ -260,6 +306,54 @@ proposal = await wallet.get_owner_proposal(index)       # OwnerProposal dataclas
 
 ---
 
+#### ERC20 token operations
+
+Get an `AsyncERC20Manager` via `client.erc20(token_address, wallet_address)`.
+
+```python
+token = client.erc20("0xTokenAddress", "0xYourWalletAddress")
+```
+
+**Read operations** query the token contract directly:
+
+```python
+name     = await token.name()
+symbol   = await token.symbol()
+decimals = await token.decimals()
+supply   = await token.total_supply()
+
+# Balance of any address
+balance = await token.balance_of("0xSomeAddress")
+
+# Shortcut — balance held by the wallet itself
+wallet_balance = await token.wallet_balance()
+
+# Allowance
+allowance = await token.allowance("0xOwner", "0xSpender")
+```
+
+**Write operations** encode the ERC20 calldata and submit it through the wallet's multi-sig queue. They return the proposal `tx_index`, which owners then confirm or reject like any other transaction.
+
+```python
+import time
+expiry = int(time.time()) + 3600
+
+# Propose a token transfer from the wallet
+tx_index = await token.transfer("0xRecipient", 100 * 10**18, expiry=expiry)
+
+# Propose an approval
+tx_index = await token.approve("0xSpender", 500 * 10**18, expiry=expiry)
+
+# Propose a transferFrom
+tx_index = await token.transfer_from("0xFrom", "0xTo", 50 * 10**18, expiry=expiry)
+
+# Owners vote on the proposal as usual
+wallet = client.wallet("0xYourWalletAddress")
+await wallet.confirm_transaction(tx_index)
+```
+
+---
+
 ### Full async example
 
 ```python
@@ -306,13 +400,54 @@ async def main():
 asyncio.run(main())
 ```
 
+### Full async ERC20 example
+
+```python
+import asyncio
+import time
+from safteawallet_py.aio import AsyncSafeTeaClient
+
+async def main():
+    client = AsyncSafeTeaClient(
+        rpc_url="https://your.rpc.endpoint",
+        factory_address="0xFactoryAddress",
+        private_key="0xOwner1PrivateKey",
+    )
+    await client.check_connection()
+
+    token = client.erc20("0xTokenAddress", "0xYourWalletAddress")
+
+    # Read token info
+    print(await token.name())
+    print(await token.symbol())
+    print(await token.decimals())
+    print("Wallet balance:", await token.wallet_balance())
+
+    # Propose a transfer — goes into the multi-sig queue
+    expiry = int(time.time()) + 3600
+    tx_index = await token.transfer("0xRecipient", 100 * 10**18, expiry=expiry)
+    print("Transfer proposal submitted at index:", tx_index)
+
+    # Second owner confirms
+    client2 = AsyncSafeTeaClient(
+        rpc_url="https://your.rpc.endpoint",
+        factory_address="0xFactoryAddress",
+        private_key="0xOwner2PrivateKey",
+    )
+    wallet2 = client2.wallet("0xYourWalletAddress")
+    await wallet2.confirm_transaction(tx_index)
+    print("Transfer confirmed and executed.")
+
+asyncio.run(main())
+```
+
 ---
 
 ## Exceptions
 
 | Exception | Description |
 |---|---|
-| `SafeTeaError` | Base exception for all SDK errors |
+| `SafeTeaError` | Base exception for all SDK errors (also wraps ERC20 operation errors) |
 | `NotOwnerError` | Caller is not a wallet owner |
 | `AlreadyVotedError` | Caller already voted on this proposal |
 | `TransactionExpiredError` | Proposal has passed its expiry timestamp |
